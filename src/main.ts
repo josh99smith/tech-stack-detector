@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { CheerioCrawler, type ProxyConfigurationOptions } from '@crawlee/cheerio';
 import { Actor, log } from 'apify';
 
-import { collectDns, collectFromHtml, normalizeHeaders, parseCookies, truncateHtml } from './collect.js';
+import { collectDns, collectFromHtml, detectChallengePage, normalizeHeaders, parseCookies, truncateHtml } from './collect.js';
 import { type FingerprintBundle, type ResolvedTechnology, TechnologyDetector } from './engine.js';
 
 const CHARGE_EVENT = 'site-analyzed';
@@ -177,6 +177,23 @@ const crawler = new CheerioCrawler({
         const cookies = parseCookies(headers['set-cookie']);
         const fromHtml = collectFromHtml($);
         const finalUrl = request.loadedUrl ?? request.url;
+
+        const challenge = detectChallengePage(fromHtml.title, html, response.statusCode ?? 200);
+        if (challenge) {
+            failed += 1;
+            const item: FailureItem = {
+                url: request.userData.originalUrl,
+                success: false,
+                errorType: 'blocked',
+                error: `${challenge}. The page could not be analyzed, so it was not charged. Enabling Apify Proxy (residential) may help.`,
+                statusCode: response.statusCode,
+                fetchedAt: new Date().toISOString(),
+            };
+            log.warning(`${finalUrl}: blocked - ${challenge}`);
+            await Actor.pushData(item); // free of charge
+            return;
+        }
+
         const dns = detectViaDns ? await collectDns(new URL(finalUrl).hostname) : undefined;
 
         const technologies = detector.detect({

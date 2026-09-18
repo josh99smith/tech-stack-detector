@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { load } from 'cheerio';
 import { describe, expect, it } from 'vitest';
 
-import { collectFromHtml, normalizeHeaders, parseCookies } from '../src/collect.js';
+import { collectFromHtml, detectChallengePage, normalizeHeaders, parseCookies } from '../src/collect.js';
 import { compilePattern, type FingerprintBundle, resolveVersion, TechnologyDetector } from '../src/engine.js';
 
 const bundle = JSON.parse(readFileSync(new URL('../src/data/fingerprints.json', import.meta.url), 'utf8')) as FingerprintBundle;
@@ -122,5 +122,20 @@ describe('collect helpers', () => {
         expect(data.css).toEqual(['.a{}']);
         expect(data.text).toBe('Hello');
         expect(data.querySelectorAll?.('title').length).toBe(1);
+    });
+});
+
+describe('detectChallengePage', () => {
+    it('flags known challenge titles and markers', () => {
+        expect(detectChallengePage('Client Challenge', '<html><noscript>Please enable JavaScript</noscript></html>', 200)).toMatch(/bot-challenge/);
+        expect(detectChallengePage('Just a moment...', '<html></html>', 503)).toMatch(/bot-challenge/);
+        expect(detectChallengePage('Home', '<script src="/cdn-cgi/challenge-platform/h/b/orchestrate"></script>', 200)).toMatch(/challenge-platform/);
+        expect(detectChallengePage('Forbidden', '<html>denied</html>', 403)).toMatch(/HTTP 403/);
+    });
+
+    it('does not flag normal pages', () => {
+        const big = '<html><head><title>Shop</title></head><body>' + 'x'.repeat(40_000) + '</body></html>';
+        expect(detectChallengePage('Shop', big, 200)).toBeNull();
+        expect(detectChallengePage('Blog', '<html><body>hello world</body></html>', 200)).toBeNull();
     });
 });

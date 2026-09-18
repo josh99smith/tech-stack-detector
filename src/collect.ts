@@ -111,3 +111,61 @@ export async function collectDns(hostname: string, timeoutMs = 4000): Promise<Re
     if (cname) out.cname = cname;
     return out;
 }
+
+const CHALLENGE_TITLES = [
+    /^client challenge$/i,
+    /^just a moment/i,
+    /^attention required/i,
+    /^access denied$/i,
+    /^one moment, please/i,
+    /^please wait\.\.\./i,
+    /^checking your browser/i,
+    /^verifying you are human/i,
+    /^security check/i,
+    /^bot verification/i,
+    /^are you a robot/i,
+    /^pardon our interruption/i,
+    /^ddos-guard$/i,
+    /^blocked$/i,
+];
+
+const CHALLENGE_MARKERS = [
+    'cf-browser-verification',
+    'cf_chl_opt',
+    '/cdn-cgi/challenge-platform/',
+    'challenge-running',
+    '_fs-ch-', // Fastly / F5 client challenge
+    'px-captcha',
+    'perimeterx',
+    'datadome.co/captcha',
+    'captcha-delivery.com',
+    'awswaf',
+    'akamai-bot-manager',
+    'distil_r_captcha',
+    'imperva',
+    'incapsula',
+    'kasada',
+    'hcaptcha.com/1/api.js',
+    'recaptcha/api.js?render=',
+    'ddos-guard',
+    'sucuri_cloudproxy',
+];
+
+/**
+ * Detects anti-bot challenge / access-denied pages so that they are never billed as a real analysis.
+ * These pages are tiny, ask for JavaScript or a CAPTCHA, and carry none of the site's real markup.
+ */
+export function detectChallengePage(title: string | null, html: string, statusCode: number): string | null {
+    const t = (title ?? '').trim();
+    if (CHALLENGE_TITLES.some((re) => re.test(t))) return `Site served a bot-challenge page ("${t}")`;
+    const head = html.slice(0, 60_000).toLowerCase();
+    const marker = CHALLENGE_MARKERS.find((m) => head.includes(m));
+    if (marker && html.length < 30_000) return `Site served a bot-challenge page (${marker})`;
+    if ((statusCode === 403 || statusCode === 429 || statusCode === 503) && html.length < 30_000) {
+        return `Site refused the request with HTTP ${statusCode}`;
+    }
+    if (html.length < 6_000 && /please enable javascript|javascript is (disabled|required)/i.test(html) && /<noscript/i.test(html)) {
+        return 'Site served a JavaScript-only challenge page';
+    }
+    return null;
+}
