@@ -1,0 +1,4 @@
+This Actor's source code is licensed under the GNU General Public License v3.0.
+The bundled technology fingerprints (src/data/fingerprints.json) are derived from
+https://github.com/enthec/webappanalyzer and are also licensed under GPL-3.0.
+Full license text: https://www.gnu.org/licenses/gpl-3.0.txt

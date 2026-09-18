@@ -1,0 +1,18 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Website Tech Stack Detector output",
+    "properties": {
+        "results": {
+            "type": "string",
+            "title": "Detected technologies",
+            "template": "{{links.apiDefaultDatasetUrl}}",
+            "description": "One record per website with the full list of detected technologies, versions, categories and confidence."
+        },
+        "summary": {
+            "type": "string",
+            "title": "Run summary",
+            "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY",
+            "description": "Counts of requested, analyzed, failed and billed websites."
+        }
+    }
+}

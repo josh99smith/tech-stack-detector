@@ -1,0 +1,21 @@
+{
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "tech-stack-detector",
+    "title": "Website Tech Stack Detector",
+    "description": "Detect the CMS, frameworks, analytics, ecommerce platform, CDN, hosting, marketing tools and 7,000+ other technologies behind any website. Wappalyzer and BuiltWith alternative with per-site pricing.",
+    "version": "0.1",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty",
+        "generatedBy": "Claude Code with Claude Opus 5"
+    },
+    "inputSchema": "./input_schema.json",
+    "outputSchema": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile",
+    "minMemoryMbytes": 256,
+    "maxMemoryMbytes": 2048
+}

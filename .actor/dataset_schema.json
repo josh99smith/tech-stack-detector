@@ -1,0 +1,43 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": ["url", "success", "technologyCount", "byCategory", "server", "statusCode", "errorType", "error"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "Website", "format": "link" },
+                    "success": { "label": "OK", "format": "boolean" },
+                    "technologyCount": { "label": "# Technologies", "format": "number" },
+                    "byCategory": { "label": "Technologies by category", "format": "object" },
+                    "server": { "label": "Server header", "format": "text" },
+                    "statusCode": { "label": "HTTP status", "format": "number" },
+                    "errorType": { "label": "Error type", "format": "text" },
+                    "error": { "label": "Error", "format": "text" }
+                }
+            }
+        },
+        "technologies": {
+            "title": "Technologies",
+            "transformation": {
+                "fields": ["url", "technologies"],
+                "unwind": ["technologies"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "Website", "format": "link" },
+                    "technologies.name": { "label": "Technology", "format": "text" },
+                    "technologies.categories": { "label": "Categories", "format": "array" },
+                    "technologies.version": { "label": "Version", "format": "text" },
+                    "technologies.confidence": { "label": "Confidence", "format": "number" },
+                    "technologies.website": { "label": "Vendor site", "format": "link" }
+                }
+            }
+        }
+    }
+}

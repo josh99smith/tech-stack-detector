@@ -1,0 +1,71 @@
+{
+    "$schema": "https://apify.com/schemas/v1/input.ide.json",
+    "title": "Website Tech Stack Detector input",
+    "description": "Paste one or more website URLs. Each analyzed site is one billable result; sites that cannot be fetched are reported for free.",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "urls": {
+            "title": "Website URLs",
+            "type": "array",
+            "description": "One website per line (or a JSON array of URLs). The scheme is optional: `example.com` and `https://example.com` both work. Duplicates are removed automatically.",
+            "editor": "stringList",
+            "prefill": ["https://www.shopify.com", "https://wordpress.org", "https://www.nytimes.com", "https://stripe.com"],
+            "uniqueItems": true
+        },
+        "detectViaDns": {
+            "title": "Also check DNS records",
+            "type": "boolean",
+            "description": "Look up TXT, MX, NS, SOA and CNAME records to detect email providers, DNS hosts, domain verification for SaaS tools, and more. Adds ~0.5 s per site.",
+            "default": true
+        },
+        "includeDescriptions": {
+            "title": "Include technology descriptions",
+            "type": "boolean",
+            "description": "Add a short description of every detected technology to the output (makes the dataset larger).",
+            "default": false
+        },
+        "includeEvidence": {
+            "title": "Include detection evidence",
+            "type": "boolean",
+            "description": "List which signals (HTTP header, script URL, meta tag, cookie, DNS record, ...) produced each detection. Useful for auditing results.",
+            "default": false
+        },
+        "maxConcurrency": {
+            "title": "Max concurrency",
+            "type": "integer",
+            "description": "How many websites to analyze in parallel.",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 50,
+            "editor": "number"
+        },
+        "timeoutSecs": {
+            "title": "Request timeout (seconds)",
+            "type": "integer",
+            "description": "Give up on a website after this many seconds.",
+            "default": 30,
+            "minimum": 5,
+            "maximum": 120,
+            "editor": "number"
+        },
+        "maxRetries": {
+            "title": "Retries per website",
+            "type": "integer",
+            "description": "How many times to retry a website that fails to load before reporting it as failed.",
+            "default": 1,
+            "minimum": 0,
+            "maximum": 5,
+            "editor": "number"
+        },
+        "proxyConfiguration": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Optional. Route requests through Apify Proxy if some target sites block cloud IP addresses. Proxy usage is billed by Apify separately from this Actor's per-site price.",
+            "editor": "proxy",
+            "prefill": { "useApifyProxy": false },
+            "sectionCaption": "Advanced"
+        }
+    },
+    "required": ["urls"]
+}
