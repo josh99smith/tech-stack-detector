@@ -1,10 +1,18 @@
 {
     "seoTitle": "Website Tech Stack Detector API (Wappalyzer alternative)",
     "seoDescription": "Detect what any website is built with: CMS, ecommerce, frameworks, analytics, CDN, hosting. 7,600+ technologies, pay per site, failed URLs are free.",
-    "categories": ["DEVELOPER_TOOLS", "LEAD_GENERATION", "SEO_TOOLS"],
+    "categories": [
+        "DEVELOPER_TOOLS",
+        "LEAD_GENERATION",
+        "SEO_TOOLS"
+    ],
     "isPublic": true,
     "actorPermissionLevel": "LIMITED_PERMISSIONS",
-    "defaultRunOptions": { "build": "latest", "memoryMbytes": 512, "timeoutSecs": 3600 },
+    "defaultRunOptions": {
+        "build": "latest",
+        "memoryMbytes": 512,
+        "timeoutSecs": 3600
+    },
     "pricing": {
         "events": {
             "site-analyzed": {
@@ -14,5 +22,6 @@
                 "isPrimaryEvent": true
             }
         }
-    }
+    },
+    "pictureUrl": "https://api.apify.com/v2/key-value-stores/xwGvZbThlWx5vaPgh/records/tech-stack-detector.png"
 }

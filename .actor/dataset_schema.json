@@ -1,6 +1,121 @@
 {
     "actorSpecification": 1,
-    "fields": {},
+    "fields": {
+        "type": "object",
+        "properties": {
+            "url": {
+                "type": "string",
+                "description": "The website URL exactly as you entered it in the input."
+            },
+            "success": {
+                "type": "boolean",
+                "description": "True when the page was fetched and analyzed (billed); false for a free failure record."
+            },
+            "fetchedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "ISO 8601 timestamp of when the website was processed."
+            },
+            "finalUrl": {
+                "type": "string",
+                "description": "The URL that was actually analyzed, after following redirects."
+            },
+            "statusCode": {
+                "type": "integer",
+                "description": "HTTP status code of the final response (also present on some failures)."
+            },
+            "title": {
+                "type": ["string", "null"],
+                "description": "Contents of the page's <title> tag, or null if it has none."
+            },
+            "technologyCount": {
+                "type": "integer",
+                "description": "Number of technologies detected on the website."
+            },
+            "technologies": {
+                "type": "array",
+                "description": "Every technology detected on the website, one object per match.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Human-readable technology name, for example WordPress or Cloudflare."
+                        },
+                        "slug": {
+                            "type": "string",
+                            "description": "URL-safe identifier of the technology, for example google-tag-manager."
+                        },
+                        "categories": {
+                            "type": "array",
+                            "description": "Categories the technology belongs to, such as CMS, CDN or Analytics.",
+                            "items": { "type": "string" }
+                        },
+                        "version": {
+                            "type": ["string", "null"],
+                            "description": "Detected version string when it could be determined, otherwise null."
+                        },
+                        "confidence": {
+                            "type": "integer",
+                            "description": "Detection confidence from 0 to 100 based on how many signals matched."
+                        },
+                        "website": {
+                            "type": ["string", "null"],
+                            "description": "The technology vendor's website, or null if unknown."
+                        },
+                        "cpe": {
+                            "type": "string",
+                            "description": "Common Platform Enumeration identifier, useful for vulnerability lookups."
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Short description of the technology (only when 'Include technology descriptions' is on)."
+                        },
+                        "evidence": {
+                            "type": "array",
+                            "description": "The header, script URL, meta tag, cookie or DNS record that triggered the match (only when 'Include detection evidence' is on).",
+                            "items": { "type": "string" }
+                        }
+                    },
+                    "required": ["name", "slug", "categories", "version", "confidence", "website"]
+                }
+            },
+            "byCategory": {
+                "type": "object",
+                "description": "Technology names grouped by category, for example { \"CMS\": [\"WordPress\"] }.",
+                "additionalProperties": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            },
+            "byGroup": {
+                "type": "object",
+                "description": "Technology names grouped by broader group such as Content, Servers or Marketing.",
+                "additionalProperties": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            },
+            "server": {
+                "type": ["string", "null"],
+                "description": "Raw value of the HTTP Server response header, or null if absent."
+            },
+            "responseTimeMs": {
+                "type": "integer",
+                "description": "Milliseconds spent fetching and analyzing the website."
+            },
+            "errorType": {
+                "type": "string",
+                "description": "Failure category when success is false.",
+                "enum": ["invalid-url", "dns", "timeout", "blocked", "http-error", "network", "other"]
+            },
+            "error": {
+                "type": "string",
+                "description": "Human-readable error message explaining why the website could not be analyzed."
+            }
+        },
+        "required": ["url", "success", "fetchedAt"]
+    },
     "views": {
         "overview": {
             "title": "Overview",
