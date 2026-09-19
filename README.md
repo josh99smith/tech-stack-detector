@@ -136,6 +136,8 @@ You pay a **flat price per successfully analyzed website** (see the price shown 
 
 For comparison, a 1,000-domain lookup on this Actor costs a fraction of a single month of a BuiltWith or Wappalyzer subscription, and you only pay for what you actually run.
 
+**How it compares (September 2026).** The most-used alternative on Apify Store charges $0.10 per website and the next one $0.07 to $0.10; this Actor charges $0.008 per analyzed website with the same 7,600-technology catalogue, so 1,000 domains cost about $8 instead of $70 to $100. There is no start fee, blocked or unreachable sites are never billed, and the run stops on its own at the cost cap you set.
+
 ## Tips
 
 - **Speed**: raise **Max concurrency** (up to 50) for large lists. Most runs finish at several hundred sites per minute.
@@ -165,6 +167,10 @@ There is no fixed cap on the list size. Large lists are processed in parallel (u
 ### Is it legal to detect what technology a website uses?
 
 The Actor reads publicly served pages exactly like a browser does, at low request rates, and stores no personal data. You are responsible for using the results in compliance with the laws and terms that apply to you.
+
+### Will the output fields change between runs?
+
+No. Output fields are stable: existing fields are never renamed or removed without a major version bump announced in the changelog, and new fields are only ever added. You can build integrations on the schema without checking it after every run.
 
 ## Related Actors by the same developer
 
