@@ -40,6 +40,8 @@ interface SuccessItem {
     statusCode: number;
     title: string | null;
     technologyCount: number;
+    /** Flat list of technology names, handy for CSV exports and spreadsheet filters. */
+    technologyNames: string[];
     technologies: TechnologyOutput[];
     byCategory: Record<string, string[]>;
     byGroup: Record<string, string[]>;
@@ -51,7 +53,7 @@ interface SuccessItem {
 interface FailureItem {
     url: string;
     success: false;
-    errorType: 'invalid-url' | 'dns' | 'timeout' | 'blocked' | 'http-error' | 'network' | 'other';
+    errorType: 'invalid-url' | 'dns' | 'timeout' | 'blocked' | 'http-error' | 'network' | 'not-html' | 'other';
     error: string;
     statusCode?: number;
     fetchedAt: string;
@@ -72,8 +74,11 @@ function normalizeUrl(raw: string): string | null {
 
 export function categorizeError(message: string, statusCode?: number): FailureItem['errorType'] {
     const m = message.toLowerCase();
-    if (statusCode === 403 || statusCode === 429 || m.includes('blocked') || m.includes('captcha')) return 'blocked';
-    if (statusCode && statusCode >= 400) return 'http-error';
+    // Crawlee reports HTTP failures as "500 - Internal Server Error" / "received 403 status code".
+    const fromMessage = /^(\d{3}) - /.exec(message)?.[1] ?? /received (\d{3}) status code/.exec(message)?.[1];
+    const status = statusCode ?? (fromMessage ? Number(fromMessage) : undefined);
+    if (status === 403 || status === 429 || status === 503 || m.includes('blocked') || m.includes('captcha')) return 'blocked';
+    if (status && status >= 400) return 'http-error';
     if (m.includes('enotfound') || m.includes('getaddrinfo') || m.includes('dns')) return 'dns';
     if (m.includes('timeout') || m.includes('timed out') || m.includes('etimedout')) return 'timeout';
     if (m.includes('econnrefused') || m.includes('econnreset') || m.includes('socket') || m.includes('tls') || m.includes('certificate'))
@@ -164,14 +169,29 @@ const crawler = new CheerioCrawler({
     minConcurrency: Math.min(maxConcurrency, 2),
     maxRequestRetries: maxRetries,
     navigationTimeoutSecs: timeoutSecs,
-    requestHandlerTimeoutSecs: timeoutSecs + 30,
+    requestHandlerTimeoutSecs: timeoutSecs + 90,
     useSessionPool: true,
-    persistCookiesPerSession: false,
     ignoreSslErrors: true,
-    additionalMimeTypes: ['application/xhtml+xml', 'text/plain'],
-    async requestHandler({ request, response, body, $ }) {
+    persistCookiesPerSession: false,
+    additionalMimeTypes: ['application/xhtml+xml', 'text/plain', 'application/json', 'application/pdf', 'application/octet-stream', 'image/*'],
+    async requestHandler({ request, response, body, $, contentType }) {
         if (stopBecauseOfBudget) return;
         const started = Date.now();
+        const mime = contentType?.type ?? String(response.headers['content-type'] ?? '').split(';')[0].trim();
+        if (typeof $ !== 'function' || (mime && !/html|xml/i.test(mime))) {
+            failed += 1;
+            const item: FailureItem = {
+                url: request.userData.originalUrl,
+                success: false,
+                errorType: 'not-html',
+                error: `The URL returned ${mime || 'a non-HTML response'} instead of a web page, so there is nothing to analyze. It was not charged.`,
+                statusCode: response.statusCode,
+                fetchedAt: new Date().toISOString(),
+            };
+            log.warning(`${request.loadedUrl ?? request.url}: not-html (${mime || 'unknown content type'})`);
+            await Actor.pushData(item);
+            return;
+        }
         const html = truncateHtml(typeof body === 'string' ? body : body.toString('utf8'));
         const headers = normalizeHeaders(response.headers as Record<string, string | string[] | undefined>);
         const cookies = parseCookies(headers['set-cookie']);
@@ -212,6 +232,7 @@ const crawler = new CheerioCrawler({
             statusCode: response.statusCode ?? 200,
             title: fromHtml.title,
             technologyCount: technologies.length,
+            technologyNames: technologies.map((t) => t.name),
             technologies: shapeTechnologies(technologies, includeDescriptions, includeEvidence),
             byCategory: groupBy(technologies, 'categories'),
             byGroup: groupBy(technologies, 'groups'),
@@ -220,9 +241,9 @@ const crawler = new CheerioCrawler({
             fetchedAt: new Date().toISOString(),
         };
 
-        const { eventChargeLimitReached, chargedCount } = await Actor.pushData(item, CHARGE_EVENT);
+        const { eventChargeLimitReached } = await Actor.pushData(item, CHARGE_EVENT);
         analyzed += 1;
-        charged += chargedCount ?? 0;
+        charged += 1;
         log.info(`${finalUrl}: ${technologies.length} technologies (${technologies.slice(0, 5).map((t) => t.name).join(', ')}${technologies.length > 5 ? ', ...' : ''})`);
         if (eventChargeLimitReached) {
             stopBecauseOfBudget = true;
@@ -233,11 +254,12 @@ const crawler = new CheerioCrawler({
     async failedRequestHandler({ request }, error) {
         failed += 1;
         const statusCode = (error as { statusCode?: number }).statusCode ?? (error as { response?: { statusCode?: number } }).response?.statusCode;
+        const message = error.message?.trim() || `${error.name || 'Connection failed'}: the server did not send a usable response`;
         const item: FailureItem = {
             url: request.userData.originalUrl,
             success: false,
-            errorType: categorizeError(error.message, statusCode),
-            error: error.message.slice(0, 500),
+            errorType: categorizeError(message, statusCode),
+            error: message.slice(0, 500),
             statusCode,
             fetchedAt: new Date().toISOString(),
         };

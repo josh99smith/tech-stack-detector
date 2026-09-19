@@ -1,0 +1,222 @@
+{
+    "happy-path": {
+        "input": {
+            "urls": [
+                "https://www.shopify.com",
+                "https://wordpress.org",
+                "https://stripe.com",
+                "https://github.com",
+                "https://www.nytimes.com"
+            ]
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "minOk": 4,
+            "maxFailed": 1,
+            "maxDurationSecs": 90
+        }
+    },
+    "redirects-and-schemes": {
+        "input": {
+            "urls": [
+                "http://github.com",
+                "shopify.com",
+                "http://info.cern.ch",
+                "http://example.com",
+                "example.com/path?q=1#frag"
+            ]
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "minOk": 5,
+            "maxFailed": 0
+        }
+    },
+    "non-html-and-errors": {
+        "input": {
+            "urls": [
+                "https://httpbin.org/status/404",
+                "https://httpbin.org/status/500",
+                "https://httpbin.org/json",
+                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                "https://httpbin.org/delay/10"
+            ]
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "maxOk": 0,
+            "errorTypes": [
+                "http-error",
+                "not-html",
+                "timeout",
+                "network",
+                "blocked"
+            ]
+        }
+    },
+    "bad-input": {
+        "input": {
+            "urls": [
+                "not a url",
+                "",
+                "   ",
+                "ftp://example.com",
+                "https://",
+                "https://this-domain-does-not-exist-abc123.com",
+                "localhost",
+                "https://256.256.256.256"
+            ]
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "minOk": 0,
+            "errorTypes": [
+                "invalid-url",
+                "dns",
+                "network",
+                "timeout",
+                "other"
+            ]
+        }
+    },
+    "unicode-and-idn": {
+        "input": {
+            "urls": [
+                "https://www.xn--80ak6aa92e.com",
+                "https://m\u00fcnchen.de",
+                "https://www.wikipedia.org/wiki/\u00d1and\u00fa"
+            ]
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "minOk": 3,
+            "maxFailed": 0
+        }
+    },
+    "duplicates-collapsed": {
+        "input": {
+            "urls": [
+                "https://wordpress.org",
+                "https://wordpress.org/",
+                "wordpress.org",
+                "http://wordpress.org"
+            ]
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "maxItems": 3
+        }
+    },
+    "bulk-50-concurrency": {
+        "input": {
+            "urls": [
+                "https://www.hubspot.com",
+                "https://www.etsy.com",
+                "https://www.bbc.co.uk",
+                "https://www.airbnb.com",
+                "https://www.wix.com",
+                "https://squarespace.com",
+                "https://vercel.com",
+                "https://www.walmart.com",
+                "https://ghost.org",
+                "https://www.notion.so",
+                "https://www.salesforce.com",
+                "https://www.zendesk.com",
+                "https://laravel.com",
+                "https://www.bigcommerce.com",
+                "https://www.webflow.com",
+                "https://www.apple.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.ibm.com",
+                "https://www.oracle.com",
+                "https://www.adobe.com",
+                "https://www.netflix.com",
+                "https://www.spotify.com",
+                "https://www.dropbox.com",
+                "https://slack.com",
+                "https://zoom.us",
+                "https://www.atlassian.com",
+                "https://www.cloudflare.com",
+                "https://www.digitalocean.com",
+                "https://www.heroku.com",
+                "https://www.mongodb.com",
+                "https://www.postgresql.org",
+                "https://www.python.org",
+                "https://nodejs.org",
+                "https://www.php.net",
+                "https://go.dev",
+                "https://www.rust-lang.org",
+                "https://www.docker.com",
+                "https://kubernetes.io",
+                "https://www.gitlab.com",
+                "https://bitbucket.org",
+                "https://www.figma.com",
+                "https://www.canva.com",
+                "https://mailchimp.com",
+                "https://www.intercom.com",
+                "https://www.twilio.com",
+                "https://sendgrid.com",
+                "https://www.klaviyo.com",
+                "https://www.woocommerce.com",
+                "https://www.magento.com"
+            ],
+            "maxConcurrency": 25
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "minOk": 40,
+            "maxDurationSecs": 180,
+            "maxCostUsd": 0.05
+        },
+        "memoryMbytes": 1024
+    },
+    "budget-cap-stops-early": {
+        "input": {
+            "urls": [
+                "https://wordpress.org",
+                "https://ghost.org",
+                "https://laravel.com",
+                "https://vercel.com",
+                "https://www.python.org",
+                "https://nodejs.org",
+                "https://go.dev",
+                "https://www.php.net"
+            ],
+            "maxConcurrency": 1
+        },
+        "maxTotalChargeUsd": 0.02,
+        "expect": {
+            "status": "SUCCEEDED",
+            "maxItems": 3,
+            "stoppedEarlyDueToBudget": true
+        }
+    },
+    "options-all-on": {
+        "input": {
+            "urls": [
+                "https://wordpress.org",
+                "https://www.shopify.com"
+            ],
+            "detectViaDns": true,
+            "includeDescriptions": true,
+            "includeEvidence": true,
+            "maxRetries": 0,
+            "timeoutSecs": 15
+        },
+        "expect": {
+            "status": "SUCCEEDED",
+            "minOk": 2,
+            "maxFailed": 0
+        }
+    },
+    "empty-input-fails-cleanly": {
+        "input": {
+            "urls": []
+        },
+        "expect": {
+            "status": "FAILED",
+            "maxItems": 0
+        }
+    }
+}

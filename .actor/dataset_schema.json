@@ -32,6 +32,11 @@
                 "type": "integer",
                 "description": "Number of technologies detected on the website."
             },
+            "technologyNames": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Flat list of detected technology names, convenient for CSV exports and spreadsheet filters."
+            },
             "technologies": {
                 "type": "array",
                 "description": "Every technology detected on the website, one object per match.",
@@ -107,7 +112,7 @@
             "errorType": {
                 "type": "string",
                 "description": "Failure category when success is false.",
-                "enum": ["invalid-url", "dns", "timeout", "blocked", "http-error", "network", "other"]
+                "enum": ["invalid-url", "dns", "timeout", "blocked", "http-error", "network", "not-html", "other"]
             },
             "error": {
                 "type": "string",

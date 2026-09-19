@@ -55,10 +55,91 @@ export interface CompiledPattern {
 
 interface CompiledDomRule {
     selector: string;
+    /** Per comma-branch, the lower-cased literals that must all occur in the raw HTML for the branch to match.
+     *  If every branch has a missing literal the selector cannot match and the DOM query is skipped. */
+    literals: string[][];
     exists?: CompiledPattern[];
     text?: CompiledPattern[];
     attributes?: Record<string, CompiledPattern[]>;
 }
+
+/** Splits a selector list on top-level commas (ignoring commas inside quotes or brackets). */
+function splitSelectorList(selector: string): string[] {
+    const parts: string[] = [];
+    let depth = 0;
+    let quote: string | null = null;
+    let cur = '';
+    for (const ch of selector) {
+        if (quote) {
+            if (ch === quote) quote = null;
+        } else if (ch === '"' || ch === "'") quote = ch;
+        else if (ch === '[' || ch === '(') depth++;
+        else if (ch === ']' || ch === ')') depth--;
+        else if (ch === ',' && depth === 0) {
+            parts.push(cur.trim());
+            cur = '';
+            continue;
+        }
+        cur += ch;
+    }
+    if (cur.trim()) parts.push(cur.trim());
+    return parts;
+}
+
+/**
+ * For each comma-separated branch of a selector, the lower-cased literal tokens that MUST occur in the
+ * document for that branch to match: `#id`, `.class` and quoted attribute values (`[href*='wp-content']`).
+ * A branch with no usable literal (e.g. `iframe`, `[data-foo]`) yields an empty list and always runs.
+ */
+export function selectorLiterals(selector: string): string[][] {
+    return splitSelectorList(selector).map((branch) => {
+        const out = new Set<string>();
+        const attrValue = /\[[^\]]*?[*^$|~]?=\s*(?:'([^']+)'|"([^"]+)"|([^\]\s'"]+))\s*[is]?\s*\]/g;
+        for (const m of branch.matchAll(attrValue)) {
+            const v = (m[1] ?? m[2] ?? m[3] ?? '').trim().toLowerCase();
+            if (v.length >= 4) out.add(v);
+        }
+        // Strip quoted strings and bracket expressions before looking for #id / .class tokens.
+        const bare = branch.replace(/\[[^\]]*\]/g, ' ').replace(/'[^']*'|"[^"]*"/g, ' ');
+        for (const m of bare.matchAll(/[#.]([A-Za-z0-9_-]{4,})/g)) out.add(m[1].toLowerCase());
+        return [...out];
+    });
+}
+
+/**
+ * Single-pass substring index: a Bloom filter over every 4-character gram of the (lower-cased) document.
+ * `mayContain(literal)` is false only when the literal definitely does not occur, so it is a safe
+ * pre-filter for DOM selectors: building it is O(n) once per page, each check is a few array reads.
+ */
+/* eslint-disable no-bitwise -- bit-packed Bloom filter */
+export class GramIndex {
+    private readonly bits: Uint8Array;
+    private readonly mask: number;
+
+    constructor(text: string, bitsPow2 = 24) {
+        this.bits = new Uint8Array(1 << (bitsPow2 - 3));
+        this.mask = (1 << bitsPow2) - 1;
+        const n = text.length;
+        // Hash each 4-gram directly (a few multiplies per position; ~10 ms per MB).
+        for (let i = 0; i + 4 <= n; i++) {
+            const g = ((((text.charCodeAt(i) * 31 + text.charCodeAt(i + 1)) * 31 + text.charCodeAt(i + 2)) * 31 + text.charCodeAt(i + 3)) | 0) & this.mask;
+            this.bits[g >>> 3] |= 1 << (g & 7);
+        }
+    }
+
+    private hasGram(text: string, i: number): boolean {
+        const g = ((((text.charCodeAt(i) * 31 + text.charCodeAt(i + 1)) * 31 + text.charCodeAt(i + 2)) * 31 + text.charCodeAt(i + 3)) | 0) & this.mask;
+        return (this.bits[g >>> 3] & (1 << (g & 7))) !== 0;
+    }
+
+    /** False means the literal is certainly absent. Literals shorter than 4 chars are always "maybe". */
+    mayContain(literal: string): boolean {
+        if (literal.length < 4) return true;
+        for (let i = 0; i + 4 <= literal.length; i++) if (!this.hasGram(literal, i)) return false;
+        return true;
+    }
+}
+/* eslint-enable no-bitwise */
 
 export interface CompiledTechnology {
     name: string;
@@ -178,10 +259,10 @@ const compileMap = (value: Record<string, string | string[]> | undefined): Recor
 const compileDom = (value: RawTechnology['dom']): CompiledDomRule[] => {
     if (!value) return [];
     if (typeof value === 'string' || Array.isArray(value)) {
-        return toArray(value).map((selector) => ({ selector, exists: [compilePattern('')] }));
+        return toArray(value).map((selector) => ({ selector, literals: selectorLiterals(selector), exists: [compilePattern('')] }));
     }
     return Object.entries(value).map(([selector, rule]) => {
-        const compiled: CompiledDomRule = { selector };
+        const compiled: CompiledDomRule = { selector, literals: selectorLiterals(selector) };
         if (rule.exists !== undefined) compiled.exists = [compilePattern(rule.exists)];
         if (rule.text !== undefined) compiled.text = compileList(rule.text);
         if (rule.attributes) {
@@ -251,6 +332,7 @@ export function resolveVersion(pattern: CompiledPattern, value: string): string 
 }
 
 const MAX_VALUE_LENGTH = 2_000_000;
+const REGEX_HTML_LIMIT = 1_000_000;
 
 function matchPatterns(
     tech: CompiledTechnology,
@@ -290,9 +372,12 @@ function matchMap(
     }
 }
 
-function matchDom(tech: CompiledTechnology, page: PageData, out: Detection[]): void {
+function matchDom(tech: CompiledTechnology, page: PageData, out: Detection[], index?: GramIndex): void {
     if (!page.querySelectorAll || tech.dom.length === 0) return;
     for (const rule of tech.dom) {
+        // Cheap pre-check: a selector that needs `#foo` or `[href*='bar']` cannot match a document that
+        // never contains "foo" / "bar". Skips the vast majority of DOM queries on large pages.
+        if (index && rule.literals.length && !rule.literals.some((branch) => branch.every((lit) => index.mayContain(lit)))) continue;
         let elements: DomElement[];
         try {
             elements = page.querySelectorAll(rule.selector);
@@ -333,7 +418,11 @@ export class TechnologyDetector {
     /** Runs every fingerprint against the collected page data and returns raw detections. */
     analyze(page: PageData): Detection[] {
         const out: Detection[] = [];
-        const html = page.html ? [page.html] : [];
+        // Regex families run against the first 1 MB: fingerprints live in <head> and early markup, and this
+        // keeps CPU time bounded on multi-megabyte pages.
+        const htmlForRegex = page.html && page.html.length > REGEX_HTML_LIMIT ? page.html.slice(0, REGEX_HTML_LIMIT) : page.html;
+        const html = htmlForRegex ? [htmlForRegex] : [];
+        const index = page.html ? new GramIndex(page.html.toLowerCase()) : undefined;
         const text = page.text ? [page.text] : [];
         const url = [page.url];
         for (const tech of this.technologies.values()) {
@@ -350,7 +439,7 @@ export class TechnologyDetector {
             matchMap(tech, tech.cookies, page.cookies, 'cookies', out);
             matchMap(tech, tech.meta, page.meta, 'meta', out);
             matchMap(tech, tech.dns, page.dns, 'dns', out);
-            matchDom(tech, page, out);
+            matchDom(tech, page, out, index);
         }
         return out;
     }
