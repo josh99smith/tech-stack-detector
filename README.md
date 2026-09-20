@@ -1,3 +1,5 @@
+![tech-stack-detector banner](https://raw.githubusercontent.com/josh99smith/apify-actor-assets/main/banners/tech-stack-detector.png)
+
 This **website technology detector** finds out what any website is built with in seconds. Paste a list of URLs and get back the CMS, ecommerce platform, JavaScript frameworks, analytics and marketing tags, CDN, hosting provider, email provider, security tools and more, matched against a database of **7,600+ technology fingerprints**.
 
 It is a **Wappalyzer / BuiltWith alternative** that runs as an API: no browser extension, no monthly subscription, no per-seat licence. You pay a flat price per website analyzed, and websites that cannot be reached are reported **free of charge**.
@@ -43,6 +45,8 @@ Detection is HTTP-only, so it is fast (typically 1 to 3 seconds per site) and ch
 ```
 
 ## Output
+
+![Sample output of tech-stack-detector](https://raw.githubusercontent.com/josh99smith/apify-actor-assets/main/previews/tech-stack-detector.png)
 
 One record per website. Successful records look like this (trimmed):
 
