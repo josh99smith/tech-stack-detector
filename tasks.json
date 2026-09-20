@@ -1,0 +1,72 @@
+[
+    {
+        "name": "check-if-website-uses-wordpress",
+        "title": "Check if a website uses WordPress",
+        "seoTitle": "Check if a website is built with WordPress",
+        "seoDescription": "Paste URLs and see which run WordPress, which theme builder and plugins they use, and their hosting and CDN. Pay per site, failed URLs free.",
+        "description": "Find out whether sites run WordPress and which plugins, page builders, hosting and CDN sit behind them. Useful for agencies prospecting migration or maintenance clients and for plugin vendors building lead lists.",
+        "input": {
+            "urls": [
+                "https://wordpress.org",
+                "https://techcrunch.com",
+                "https://www.bbc.com",
+                "https://www.nytimes.com",
+                "https://www.whitehouse.gov"
+            ]
+        }
+    },
+    {
+        "name": "find-websites-built-with-shopify",
+        "title": "Find out if a store runs Shopify",
+        "seoTitle": "Detect Shopify, WooCommerce and Magento stores",
+        "seoDescription": "Identify the ecommerce platform behind any online store: Shopify, WooCommerce, Magento, BigCommerce, plus payment, reviews and marketing apps.",
+        "description": "Detect the ecommerce platform, payment providers, review widgets and marketing tools behind a list of online stores. Built for app vendors, agencies and analysts qualifying ecommerce leads by platform.",
+        "input": {
+            "urls": [
+                "https://www.allbirds.com",
+                "https://www.gymshark.com",
+                "https://www.bigcommerce.com",
+                "https://www.woocommerce.com",
+                "https://www.magento.com"
+            ]
+        }
+    },
+    {
+        "name": "competitor-marketing-stack-audit",
+        "title": "Audit a competitor's marketing and analytics stack",
+        "seoTitle": "See which analytics and marketing tools a website uses",
+        "seoDescription": "Reveal the tag manager, analytics, A/B testing, chat, CRM and advertising pixels a competitor runs, with evidence for every detection.",
+        "description": "Reveal the analytics, tag managers, A/B testing, chat widgets, CRM integrations and advertising pixels a set of competitor websites run. Evidence is included for every detection so results can be audited.",
+        "input": {
+            "urls": [
+                "https://www.hubspot.com",
+                "https://www.zendesk.com",
+                "https://www.intercom.com",
+                "https://www.salesforce.com"
+            ],
+            "includeEvidence": true
+        }
+    },
+    {
+        "name": "bulk-tech-stack-lookup-for-lead-lists",
+        "title": "Bulk tech stack lookup for a lead list",
+        "seoTitle": "Bulk website technology lookup for lead lists",
+        "seoDescription": "Run hundreds of domains at once and get CMS, framework, hosting, CDN and email provider per domain, ready for CSV export into your CRM.",
+        "description": "Enrich a list of company domains with their CMS, JavaScript framework, hosting provider, CDN, email provider and security tools in one run. Export to CSV or push to Google Sheets, HubSpot or Airtable via Integrations.",
+        "input": {
+            "urls": [
+                "https://stripe.com",
+                "https://github.com",
+                "https://vercel.com",
+                "https://www.notion.so",
+                "https://slack.com",
+                "https://www.figma.com",
+                "https://www.canva.com",
+                "https://mailchimp.com",
+                "https://www.twilio.com",
+                "https://www.cloudflare.com"
+            ],
+            "maxConcurrency": 20
+        }
+    }
+]
