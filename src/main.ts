@@ -214,6 +214,27 @@ const crawler = new CheerioCrawler({
             return;
         }
 
+        // A 4xx/5xx page or an empty body is not the website the user asked to analyze; report it free of charge,
+        // consistent with how thrown HTTP errors are categorised.
+        const statusCode = response.statusCode ?? 200;
+        if (statusCode >= 400 || html.trim().length === 0) {
+            failed += 1;
+            const item: FailureItem = {
+                url: request.userData.originalUrl,
+                success: false,
+                errorType: statusCode >= 400 ? 'http-error' : 'not-html',
+                error:
+                    statusCode >= 400
+                        ? `The server responded with HTTP ${statusCode}, so the page could not be analyzed. It was not charged.`
+                        : 'The server returned an empty response, so there is nothing to analyze. It was not charged.',
+                statusCode,
+                fetchedAt: new Date().toISOString(),
+            };
+            log.warning(`${finalUrl}: ${item.errorType} (HTTP ${statusCode})`);
+            await Actor.pushData(item); // free of charge
+            return;
+        }
+
         const dns = detectViaDns ? await collectDns(new URL(finalUrl).hostname) : undefined;
 
         const technologies = detector.detect({
