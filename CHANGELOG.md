@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 (2026-09-20)
+
+- Duplicate input URLs are now deduplicated by the Actor instead of being rejected by input validation, as the field description already promised.
+
 ## 0.1.1 (2026-09-20)
 
 - Fixed: pages answering with HTTP 4xx/5xx (for example a 404 with an HTML body) or an empty body were analysed from headers alone and billed. They are now reported as free `http-error` / `not-html` failures, consistent with how connection-level HTTP errors were already handled.

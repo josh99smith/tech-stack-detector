@@ -10,8 +10,7 @@
             "type": "array",
             "description": "One website per line (or a JSON array of URLs). The scheme is optional: `example.com` and `https://example.com` both work. Duplicates are removed automatically.",
             "editor": "stringList",
-            "prefill": ["https://www.shopify.com", "https://wordpress.org", "https://www.nytimes.com", "https://stripe.com"],
-            "uniqueItems": true
+            "prefill": ["https://www.shopify.com", "https://wordpress.org", "https://www.nytimes.com", "https://stripe.com"]
         },
         "detectViaDns": {
             "title": "Also check DNS records",
