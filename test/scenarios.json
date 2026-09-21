@@ -44,7 +44,7 @@
         },
         "expect": {
             "status": "SUCCEEDED",
-            "maxOk": 1,
+            "maxOk": 0,
             "errorTypes": [
                 "http-error",
                 "not-html",
