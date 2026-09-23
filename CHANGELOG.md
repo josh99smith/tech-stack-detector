@@ -5,6 +5,7 @@
 - Listing: joined the Best Damn series. New title "Best Damn Tech Stack Detector", new description, icon and README banner. No change to inputs, output or pricing.
 - README: new "Integrate and automate your workflow" section (Make, Zapier, n8n, Slack, Airbyte, GitHub, Google Drive, webhooks).
 - Listing: "Best Damn" in the SEO title, refreshed banner, link to the new Best Damn YouTube Comments Scraper.
+- README: link to the new Best Damn YouTube Scraper.
 
 ## 0.1.2 (2026-09-20)
 

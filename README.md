@@ -219,6 +219,7 @@ You can also attach [webhooks](https://docs.apify.com/platform/integrations/webh
 - [Best Damn Sitemap URL Extractor](https://apify.com/josh99smith/sitemap-url-extractor): all URLs from XML sitemaps.
 - [Best Damn RSS to JSON Converter](https://apify.com/josh99smith/rss-feed-to-json): feeds as JSON.
 - [Best Damn YouTube Comments Scraper](https://apify.com/josh99smith/youtube-comments-scraper): comments and replies from YouTube videos and channels.
+- [Best Damn YouTube Scraper](https://apify.com/josh99smith/youtube-scraper): videos, channels, playlists and search results with statistics.
 
 ## Support and feedback
 
