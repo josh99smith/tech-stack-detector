@@ -2,8 +2,8 @@
     "$schema": "https://apify.com/schemas/v1/actor.ide.json",
     "actorSpecification": 1,
     "name": "tech-stack-detector",
-    "title": "Website Tech Stack Detector",
-    "description": "Detect what any website is built with: CMS, ecommerce platform, frameworks, analytics, CDN, hosting and 7,600+ technologies. Pay per site; failed URLs are free.",
+    "title": "Best Damn Tech Stack Detector",
+    "description": "Detect what any website is built with, in bulk: CMS, ecommerce platform, frameworks, analytics, CDN and hosting from 7,600+ fingerprints. Straight answers at one flat price per site, and failed URLs never cost a cent.",
     "version": "0.1",
     "buildTag": "latest",
     "meta": {

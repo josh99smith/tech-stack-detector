@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 (2026-09-23)
+
+- Listing: joined the Best Damn series. New title "Best Damn Tech Stack Detector", new description, icon and README banner. No change to inputs, output or pricing.
+
 ## 0.1.2 (2026-09-20)
 
 - Duplicate input URLs are now deduplicated by the Actor instead of being rejected by input validation, as the field description already promised.
