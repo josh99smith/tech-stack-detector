@@ -1,6 +1,6 @@
 {
     "$schema": "https://apify.com/schemas/v1/input.ide.json",
-    "title": "Website Tech Stack Detector input",
+    "title": "Best Damn Tech Stack Detector input",
     "description": "Paste one or more website URLs. Each analyzed site is one billable result; sites that cannot be fetched are reported for free.",
     "type": "object",
     "schemaVersion": 1,

@@ -1,6 +1,6 @@
 {
     "actorOutputSchemaVersion": 1,
-    "title": "Website Tech Stack Detector output",
+    "title": "Best Damn Tech Stack Detector output",
     "properties": {
         "results": {
             "type": "string",

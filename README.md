@@ -1,4 +1,4 @@
-![tech-stack-detector banner](https://raw.githubusercontent.com/josh99smith/apify-actor-assets/main/banners/tech-stack-detector.png)
+![tech-stack-detector banner](https://raw.githubusercontent.com/josh99smith/apify-actor-assets/main/banners/tech-stack-detector.png?v=bd1)
 
 This **website technology detector** finds out what any website is built with in seconds. Paste a list of URLs and get back the CMS, ecommerce platform, JavaScript frameworks, analytics and marketing tags, CDN, hosting provider, email provider, security tools and more, matched against a database of **7,600+ technology fingerprints**.
 
@@ -218,6 +218,7 @@ You can also attach [webhooks](https://docs.apify.com/platform/integrations/webh
 - [Best Damn PDF Text Extractor](https://apify.com/josh99smith/pdf-text-extractor): text and metadata from PDFs.
 - [Best Damn Sitemap URL Extractor](https://apify.com/josh99smith/sitemap-url-extractor): all URLs from XML sitemaps.
 - [Best Damn RSS to JSON Converter](https://apify.com/josh99smith/rss-feed-to-json): feeds as JSON.
+- [Best Damn YouTube Comments Scraper](https://apify.com/josh99smith/youtube-comments-scraper): comments and replies from YouTube videos and channels.
 
 ## Support and feedback
 
