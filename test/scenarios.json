@@ -23,7 +23,7 @@
                 "shopify.com",
                 "http://info.cern.ch",
                 "http://example.com",
-                "example.com/path?q=1#frag"
+                "example.com/?q=1#frag"
             ]
         },
         "expect": {
