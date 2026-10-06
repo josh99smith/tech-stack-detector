@@ -223,7 +223,7 @@ You can also attach [webhooks](https://docs.apify.com/platform/integrations/webh
 
 ## Support and feedback
 
-Found a site that is misdetected, or a technology that is missing? Open a ticket in the **Issues** tab of this Actor. Fingerprint contributions are welcome upstream at [enthec/webappanalyzer](https://github.com/enthec/webappanalyzer).
+Found a site that is misdetected, or a technology that is missing? Open a ticket in the **Issues** tab of this Actor. Fingerprint contributions are welcome upstream at [enthec/webappanalyzer](https://github.com/enthec/webappanalyzer). If this Actor saved you time, a review on its Store page helps other people find it.
 
 This Actor is open source under the GPL-3.0 licence. The technology fingerprints are © their contributors, GPL-3.0.
 
