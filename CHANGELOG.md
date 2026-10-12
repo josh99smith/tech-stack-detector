@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4 (2026-10-12)
+
+- Fingerprint bundle refreshed (7628 technologies).
+
 ## 0.1.3 (2026-09-23)
 
 - Listing: joined the Best Damn series. New title "Best Damn Tech Stack Detector", new description, icon and README banner. No change to inputs, output or pricing.
