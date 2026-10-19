@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5 (2026-10-19)
+
+- Fingerprint bundle refreshed (7639 technologies).
+
 ## 0.1.4 (2026-10-12)
 
 - Fingerprint bundle refreshed (7628 technologies).
